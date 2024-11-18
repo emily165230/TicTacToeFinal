@@ -3,7 +3,6 @@ package com.example.tictactoe;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,15 +18,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         onNewGame();
     }
 
@@ -39,6 +37,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        int[] buttonIds = {R.id.btn_00, R.id.btn_01, R.id.btn_02,
+                R.id.btn_10, R.id.btn_11, R.id.btn_12,
+                R.id.btn_20, R.id.btn_21, R.id.btn_22};
+
+        for (int id : buttonIds) {
+            Button btn = findViewById(id);
+            btn.setText("");
+        }
+
         turn = "X";
         count = 0;
     }
@@ -48,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
             handleClick(0, 0, R.id.btn_00);
         else if (view.getId() == R.id.btn_01)
             handleClick(0, 1, R.id.btn_01);
-        else if (view.getId() == R.id.btn_00)
-            handleClick(0, 2, R.id.btn_00);
+        else if (view.getId() == R.id.btn_02)
+            handleClick(0, 2, R.id.btn_02);
         else if (view.getId() == R.id.btn_10)
             handleClick(1, 0, R.id.btn_10);
         else if (view.getId() == R.id.btn_11)
@@ -91,34 +98,38 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Game Over");
         builder.setMessage(message);
 
-
-        builder.setPositiveButton("EXIT", (dialogInterface, i) -> {
-
-        });
+        builder.setPositiveButton("EXIT", (dialogInterface, i) -> finish());
 
         builder.setNegativeButton("Play Again", (dialogInterface, i) -> onNewGame());
         builder.show();
     }
 
     private boolean isWinner() {
-
-        for (int i = 0; i < 3; i++) {
-            if (!board[i][0].isEmpty() && board[i][0].equals(board[i][1]) && board[i][1].equals(board[i][2])) {
+        // בדיקת שורות
+        for (int row = 0; row < 3; row++) {
+            if (!board[row][0].isEmpty() && board[row][0].equals(board[row][1]) && board[row][1].equals(board[row][2])) {
                 return true;
             }
         }
 
-
-        for (int i = 0; i < 3; i++) {
-            if (!board[0][i].isEmpty() && board[0][i].equals(board[1][i]) && board[1][i].equals(board[2][i])) {
+        // בדיקת עמודות
+        for (int col = 0; col < 3; col++) {
+            if (!board[0][col].isEmpty() && board[0][col].equals(board[1][col]) && board[1][col].equals(board[2][col])) {
                 return true;
             }
         }
 
-
+        // בדיקת אלכסון ראשי
         if (!board[0][0].isEmpty() && board[0][0].equals(board[1][1]) && board[1][1].equals(board[2][2])) {
             return true;
         }
-        return !board[0][2].isEmpty() && board[0][2].equals(board[1][1]) && board[1][1].equals(board[2][0]);
+
+        // בדיקת אלכסון משני
+        if (!board[0][2].isEmpty() && board[0][2].equals(board[1][1]) && board[1][1].equals(board[2][0])) {
+            return true;
+        }
+
+        return false;
     }
+
 }
